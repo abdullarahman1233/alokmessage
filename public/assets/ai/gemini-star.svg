@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <!-- Exact Google Gemini gradient: red(top) → blue(right) → green(bottom) → yellow(left) -->
+    <radialGradient id="gemini-center" cx="58%" cy="42%" r="55%">
+      <stop offset="0%"   stop-color="#4285F4" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#4285F4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gemini-main" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#34A853"/>
+      <stop offset="28%"  stop-color="#FBBC04"/>
+      <stop offset="55%"  stop-color="#EA4335"/>
+      <stop offset="100%" stop-color="#4285F4"/>
+    </linearGradient>
+    <linearGradient id="gemini-overlay" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#4285F4" stop-opacity="0.6"/>
+      <stop offset="50%"  stop-color="#4285F4" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#34A853" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!--
+    4-pointed star / sparkle shape.
+    The Gemini star has concave sides between the 4 points.
+    Drawn as a smooth cubic bezier path centred on 50,50.
+    Points at: top(50,2) right(98,50) bottom(50,98) left(2,50)
+    Control handles pull the sides inward to create the pinched waist.
+  -->
+  <path
+    d="
+      M 50 2
+      C 50 2, 60 35, 98 50
+      C 98 50, 60 65, 50 98
+      C 50 98, 40 65, 2 50
+      C 2 50, 40 35, 50 2
+      Z
+    "
+    fill="url(#gemini-main)"
+  />
+  <!-- Blue overlay for the right-side richness -->
+  <path
+    d="
+      M 50 2
+      C 50 2, 60 35, 98 50
+      C 98 50, 60 65, 50 98
+      C 50 98, 40 65, 2 50
+      C 2 50, 40 35, 50 2
+      Z
+    "
+    fill="url(#gemini-overlay)"
+  />
+  <!-- Soft centre highlight for the 3D sphere feel -->
+  <path
+    d="
+      M 50 2
+      C 50 2, 60 35, 98 50
+      C 98 50, 60 65, 50 98
+      C 50 98, 40 65, 2 50
+      C 2 50, 40 35, 50 2
+      Z
+    "
+    fill="url(#gemini-center)"
+  />
+</svg>

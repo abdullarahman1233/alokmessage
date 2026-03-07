@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="badge-grad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%"   stop-color="#29B6F6"/>
+      <stop offset="100%" stop-color="#1D9BF0"/>
+    </linearGradient>
+  </defs>
+
+  <!--
+    Scalloped badge shape — 12 rounded bumps around a circle.
+    Built from a series of arcs that bow outward, creating the
+    characteristic jagged-star / seal shape of the Twitter/Meta badge.
+    Centre: 50,50  Outer radius ~48  Inner radius ~38
+  -->
+  <path
+    d="
+      M 50 4
+      C 53 4, 56 5.5, 57.5 8
+      L 60 6
+      C 62 4, 65.5 4.5, 67 7
+      L 68 10
+      C 70.5 9, 73.5 10, 74.5 13
+      L 74 16
+      C 77 16.5, 79 19, 78.5 22
+      L 77 24.5
+      C 79.5 26, 80.5 29, 79 31.5
+      L 77 33.5
+      C 79 35.5, 79 39, 77 41
+      L 75 42.5
+      C 76.5 45, 76 48.5, 74 50.5
+      L 72 51.5
+      C 73 54, 72 57.5, 70 59
+      L 67.5 59.5
+      C 68 62.5, 66.5 65.5, 64 66.5
+      L 61.5 66
+      C 61.5 69, 59.5 71.5, 57 72
+      L 54.5 71
+      C 54 74, 52 76, 50 76
+      C 48 76, 46 74, 45.5 71
+      L 43 72
+      C 40.5 71.5, 38.5 69, 38.5 66
+      L 36 66.5
+      C 33.5 65.5, 32 62.5, 32.5 59.5
+      L 30 59
+      C 28 57.5, 27 54, 28 51.5
+      L 26 50.5
+      C 24 48.5, 23.5 45, 25 42.5
+      L 23 41
+      C 21 39, 21 35.5, 23 33.5
+      L 21 31.5
+      C 19.5 29, 20.5 26, 23 24.5
+      L 21.5 22
+      C 21 19, 23 16.5, 26 16
+      L 25.5 13
+      C 26.5 10, 29.5 9, 32 10
+      L 32 7
+      C 33.5 4.5, 37 4, 39 6
+      L 42.5 8
+      C 44 5.5, 47 4, 50 4
+      Z
+    "
+    fill="url(#badge-grad)"
+  />
+
+  <!-- White checkmark — thick, bold, centered -->
+  <path
+    d="M 31 50 L 43 63 L 70 35"
+    stroke="white"
+    stroke-width="8.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+</svg>
