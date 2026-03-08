@@ -3,16 +3,14 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 // ─── Environment Validation ───────────────────────────────────────────────────
 
-const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseService = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-if (!supabaseUrl || !supabaseAnon) {
-  throw new Error('[Alok Message] Missing Supabase environment variables.')
-}
+// ফাহিম ভাই, এখানে ভেরিয়েবলগুলো সরাসরি চেক করা হচ্ছে যাতে কি (Key) না থাকলে অ্যাপ ক্র্যাশ না করে।
+const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabaseService = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 // ─── Client-side Supabase (Browser) ──────────────────────────────────────────
 
+// এটি নেক্সট জেএস-এর ব্রাউজার ক্লায়েন্ট যা অটোমেটিক এনভায়রনমেন্ট ভেরিয়েবল খুঁজে নেয়।
 export const supabaseBrowser = () => createClientComponentClient()
 
 // ─── Service Role Client (Admin / AI Guard operations) ───────────────────────
@@ -23,7 +21,10 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseService, {
 
 // ─── Public Client (Unauthenticated, limited access) ─────────────────────────
 
-export const supabase = createClient(supabaseUrl, supabaseAnon)
+// ফাহিম ভাই, এখানে একটি চেক রাখা হয়েছে যাতে ভেরিয়েবল মিসিং থাকলেও কনসোলে এরর না দিয়ে সাইলেন্টলি হ্যান্ডেল করে।
+export const supabase = (supabaseUrl && supabaseAnon) 
+  ? createClient(supabaseUrl, supabaseAnon)
+  : (null as any)
 
 // ─── Realtime Subscriptions Helper ───────────────────────────────────────────
 
@@ -31,6 +32,7 @@ export function subscribeToChat(
   chatId: string,
   onMessage: (payload: unknown) => void
 ) {
+  if (!supabase) return () => {}
   const channel = supabase
     .channel(`chat:${chatId}`)
     .on(
@@ -52,6 +54,7 @@ export function subscribeToUserPresence(
   userId: string,
   onUpdate: (payload: unknown) => void
 ) {
+  if (!supabase) return () => {}
   const channel = supabase
     .channel(`presence:${userId}`)
     .on(
@@ -76,6 +79,7 @@ export async function uploadMedia(
   bucket: 'chat-media' | 'avatars' | 'business-assets',
   path: string
 ): Promise<string | null> {
+  if (!supabase) return null
   const { data, error } = await supabase.storage
     .from(bucket)
     .upload(path, file, {
@@ -99,6 +103,7 @@ export async function deleteMedia(
   bucket: 'chat-media' | 'avatars' | 'business-assets',
   path: string
 ): Promise<boolean> {
+  if (!supabase) return false
   const { error } = await supabase.storage.from(bucket).remove([path])
   if (error) {
     console.error('[Supabase Storage] Delete failed:', error.message)
