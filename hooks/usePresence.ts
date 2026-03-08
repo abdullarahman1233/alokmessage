@@ -138,15 +138,15 @@ export function useUserPresence(targetUserId: string): {
     channel
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState()
-        // ফাহিম ভাই, এখানে টাইপ কাস্টিং ঠিক করা হয়েছে যাতে বিল্ড এরর না দেয়।
         const entry = Object.values(state).flat().find((p: any) => p.userId === targetUserId)
         if (entry) {
-          setPresence(entry as UserPresence)
+          // ফাহিম ভাই, এখানে 'as unknown as' যোগ করা হয়েছে বিল্ড এরর সমাধানের জন্য।
+          setPresence(entry as unknown as UserPresence)
         }
       })
       .on('presence', { event: 'join' }, ({ newPresences }) => {
         const entry = (newPresences as any[]).find((p: any) => p.userId === targetUserId)
-        if (entry) setPresence(entry as UserPresence)
+        if (entry) setPresence(entry as unknown as UserPresence)
       })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
         const entry = (leftPresences as any[]).find((p: any) => p.userId === targetUserId)
