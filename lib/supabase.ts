@@ -3,25 +3,30 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 // ─── Environment Validation ───────────────────────────────────────────────────
 
-// ফাহিম ভাই, এখানে ভেরিয়েবলগুলো সরাসরি চেক করা হচ্ছে যাতে কি (Key) না থাকলে অ্যাপ ক্র্যাশ না করে।
 const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabaseService = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 // ─── Client-side Supabase (Browser) ──────────────────────────────────────────
 
-// এটি নেক্সট জেএস-এর ব্রাউজার ক্লায়েন্ট যা অটোমেটিক এনভায়রনমেন্ট ভেরিয়েবল খুঁজে নেয়।
-export const supabaseBrowser = () => createClientComponentClient()
+// ফাহিম ভাই, এখানে সরাসরি createClientComponentClient() কল করায় সে এনভায়রনমেন্ট ভেরিয়েবল না পেলে এরর দিচ্ছিল।
+export const supabaseBrowser = () => {
+  if (!supabaseUrl || !supabaseAnon) {
+    console.warn('[Alok Message] Supabase keys missing in browser context.')
+  }
+  return createClientComponentClient()
+}
 
 // ─── Service Role Client (Admin / AI Guard operations) ───────────────────────
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseService, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+export const supabaseAdmin = (supabaseUrl && supabaseService)
+  ? createClient(supabaseUrl, supabaseService, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+  : (null as any)
 
 // ─── Public Client (Unauthenticated, limited access) ─────────────────────────
 
-// ফাহিম ভাই, এখানে একটি চেক রাখা হয়েছে যাতে ভেরিয়েবল মিসিং থাকলেও কনসোলে এরর না দিয়ে সাইলেন্টলি হ্যান্ডেল করে।
 export const supabase = (supabaseUrl && supabaseAnon) 
   ? createClient(supabaseUrl, supabaseAnon)
   : (null as any)
