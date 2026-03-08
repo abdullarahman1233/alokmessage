@@ -17,7 +17,7 @@ import MessageBubble from '@/components/chat/MessageBubble'
 import toast from 'react-hot-toast'
 import type { Chat, Message } from '@/types'
 
-// ফাহিম ভাই, নিচত ২টি ফাংশন যোগ করা হয়েছে যাতে অনুপস্থিত কম্পোনেন্টগুলোর জন্য এরর না আসে।
+// ফাহিম ভাই, নিচত ২টি ফাংশন যোগ করা হয়েছে যাতে অনুপস্থিত কম্পোনেন্টগুলোর জন্য এরর না আসে।
 const GeminiAvatarPlaceholder = ({ breathing }: { breathing?: boolean }) => (
   <div className={`w-9 h-9 rounded-full glass electric-border flex items-center justify-center overflow-hidden ${breathing ? 'animate-pulse shadow-[0_0_15px_rgba(0,195,255,0.4)]' : ''}`}>
     <img src="/assets/ai/gemini-3-pro-luxe.png" alt="AI" className="w-full h-full object-cover" />
@@ -29,7 +29,7 @@ const GoldenSparkBadge = ({ size }: { size?: string }) => (
 );
 
 interface Props {
-  chat:             Chat
+  chat:              Chat
   initialMessages: Message[]
   currentUserId:   string
 }
@@ -319,7 +319,7 @@ export default function AiChatWindow({ chat, initialMessages, currentUserId }: P
               style={{ overflow: input.split('\n').length > 2 ? 'auto' : 'hidden' }}
             />
             <div className="absolute right-2.5 bottom-2.5 flex items-center gap-1">
-              <Globe className="w-3.5 h-3.5 text-electric/40" title="Multi-language enabled" />
+              <Globe className="w-3.5 h-3.5 text-electric/40" />
             </div>
           </div>
 
