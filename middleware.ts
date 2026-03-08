@@ -9,26 +9,33 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient({ req, res })
 
   const { data: { session } } = await supabase.auth.getSession()
-
   const path = req.nextUrl.pathname
 
-  // Allow public routes
+  // ফাহিম ভাই, রুট (/) পাথে আসলে সরাসরি চ্যাটে পাঠানোর জন্য এই চেকটি যোগ করলাম
+  if (path === '/') {
+    return NextResponse.redirect(new URL(session ? '/chat' : '/auth/login', req.url))
+  }
+
+  // পাবলিক রুট চেক
   if (PUBLIC_ROUTES.some((r) => path.startsWith(r))) {
-    // If already logged in, redirect away from auth pages
-    if (session && path.startsWith('/auth')) {
+    // যদি সেশন থাকে এবং ইউজার আবার লগইন পেজে যেতে চায়, তাকে চ্যাটে পাঠান
+    if (session) {
       return NextResponse.redirect(new URL('/chat', req.url))
     }
     return res
   }
 
-  // Require auth for everything else
+  // সেশন না থাকলে এবং পাবলিক রুট না হলে তাকে লগইন পেজে পাঠান
   if (!session) {
     const loginUrl = new URL('/auth/login', req.url)
-    loginUrl.searchParams.set('next', path)
+    // এখানে রিডাইরেক্ট লুপ এড়াতে 'next' প্যারামিটারটি সাবধানে হ্যান্ডেল করা হয়েছে
+    if (path !== '/auth/login') {
+      loginUrl.searchParams.set('next', path)
+    }
     return NextResponse.redirect(loginUrl)
   }
 
-  // Admin route protection
+  // অ্যাডমিন প্রোটেকশন
   if (ADMIN_ROUTES.some((r) => path.startsWith(r))) {
     const { data: user } = await supabase
       .from('users')
@@ -46,6 +53,13 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|icons|og-image.png).*)',
+    /*
+     * নিচের পাথগুলো বাদে সব জায়গায় মিডলওয়্যার কাজ করবে:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, icons, og-image.png (public files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|icons|og-image.png).*)',
   ],
 }
