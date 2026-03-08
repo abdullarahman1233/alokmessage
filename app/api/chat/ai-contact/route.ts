@@ -6,7 +6,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 // ─── AI System Contact Identity ───────────────────────────────────────────────
 
-// ফাহিম ভাই, এখানে 'export' শব্দটি সরিয়ে দেওয়া হয়েছে যাতে নেক্সট জেএস এরর না দেয়।
 const AI_CONTACT = {
   id:            'ai-gemini-system-contact',
   displayName:   'Gemini 3 Pro (Official)',
@@ -25,20 +24,15 @@ const AI_CONTACT = {
   createdAt:     '2026-01-01T00:00:00Z',
 }
 
-// ─── Gemini Client — No hard-coded token/message limits ───────────────────────
+// ─── Gemini Client ───────────────────────────────────────────────────────────
 
 const gemini = new GoogleGenerativeAI(
   process.env.GEMINI_3_KEY ?? process.env.GEMINI_API_KEY!
 )
 
-/**
- * Returns the Gemini model tuned for the AI contact role.
- * No maxOutputTokens cap — allows long-duration, multi-turn sessions.
- */
 function getAiContactModel() {
   return gemini.getGenerativeModel({
     model: 'gemini-1.5-pro',
-    // No max_tokens set — unlimited response length
     safetySettings: [
       {
         category:  HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -57,7 +51,11 @@ function getAiContactModel() {
         threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
       },
     ],
-    systemInstruction: `
+    // জেমিনি লাইব্রেরির নতুন নিয়ম অনুযায়ী অবজেক্ট ফরম্যাট ব্যবহার করা হয়েছে।
+    systemInstruction: {
+      role: 'system',
+      parts: [{
+        text: `
 You are Gemini 3 Pro — the official AI assistant embedded inside Alok Message, the world's most secure messaging platform.
 
 YOUR IDENTITY:
@@ -91,11 +89,13 @@ SECURITY RULES:
 - Refer serious safety concerns to Alok Guard automatically
 
 You have no hard message limit. Conversations can be as long as the user needs.
-`,
+`
+      }]
+    },
   })
 }
 
-// ─── POST — Main chat handler (text messages) ─────────────────────────────────
+// ─── POST — Main chat handler ───────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
@@ -109,21 +109,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Message is required.' }, { status: 400 })
     }
 
-    // ── Build multi-turn history for Gemini ──────────────────────────────────
     const model = getAiContactModel()
     const chat  = model.startChat({
       history: history.map((h: { role: 'user' | 'model'; content: string }) => ({
         role:  h.role,
         parts: [{ text: h.content }],
       })),
-      // No generationConfig limits — allow full unlimited responses
     })
 
-    // ── Stream response from Gemini ──────────────────────────────────────────
     const result   = await chat.sendMessage(message)
     const response = result.response.text()
 
-    // ── Persist AI reply as a message in the chat ────────────────────────────
     const { data: savedMsg, error: saveErr } = await supabaseAdmin
       .from('messages')
       .insert({
@@ -139,11 +135,8 @@ export async function POST(req: NextRequest) {
       .select()
       .single()
 
-    if (saveErr) {
-      console.error('[AI Contact] Failed to persist message:', saveErr.message)
-    }
+    if (saveErr) console.error('[AI Contact] Save error:', saveErr.message)
 
-    // ── Update chat last activity ────────────────────────────────────────────
     await supabaseAdmin
       .from('chats')
       .update({ lastActivity: new Date().toISOString() })
@@ -156,20 +149,19 @@ export async function POST(req: NextRequest) {
       model:    'gemini-1.5-pro',
     })
 
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[AI Contact] Error:', err)
-    const msg = err instanceof Error ? err.message : 'AI response failed.'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'AI failed.' }, { status: 500 })
   }
 }
 
-// ─── GET — Return AI contact profile ─────────────────────────────────────────
+// ─── GET ────────────────────────────────────────────────────────────────────
 
 export async function GET() {
   return NextResponse.json({ contact: AI_CONTACT })
 }
 
-// ─── PATCH — Streaming response (Server-Sent Events) ─────────────────────────
+// ─── PATCH ──────────────────────────────────────────────────────────────────
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -178,8 +170,6 @@ export async function PATCH(req: NextRequest) {
     if (!session) return new Response('Unauthorized', { status: 401 })
 
     const { message, history = [] } = await req.json()
-    if (!message?.trim()) return new Response('Message required', { status: 400 })
-
     const model = getAiContactModel()
     const chat  = model.startChat({
       history: history.map((h: { role: 'user' | 'model'; content: string }) => ({
@@ -188,7 +178,6 @@ export async function PATCH(req: NextRequest) {
       })),
     })
 
-    // Stream via ReadableStream → SSE
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder()
