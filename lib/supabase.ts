@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { createClientComponentClient, createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 // ─── Environment Validation ───────────────────────────────────────────────────
 
@@ -15,11 +14,6 @@ if (!supabaseUrl || !supabaseAnon) {
 // ─── Client-side Supabase (Browser) ──────────────────────────────────────────
 
 export const supabaseBrowser = () => createClientComponentClient()
-
-// ─── Server-side Supabase (Server Components / Route Handlers) ───────────────
-
-export const supabaseServer = () =>
-  createServerComponentClient({ cookies })
 
 // ─── Service Role Client (Admin / AI Guard operations) ───────────────────────
 
