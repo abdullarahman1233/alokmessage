@@ -17,8 +17,19 @@ import MessageBubble from '@/components/chat/MessageBubble'
 import toast from 'react-hot-toast'
 import type { Chat, Message } from '@/types'
 
+// ফাহিম ভাই, নিচত ২টি ফাংশন যোগ করা হয়েছে যাতে অনুপস্থিত কম্পোনেন্টগুলোর জন্য এরর না আসে।
+const GeminiAvatarPlaceholder = ({ breathing }: { breathing?: boolean }) => (
+  <div className={`w-9 h-9 rounded-full glass electric-border flex items-center justify-center overflow-hidden ${breathing ? 'animate-pulse shadow-[0_0_15px_rgba(0,195,255,0.4)]' : ''}`}>
+    <img src="/assets/ai/gemini-3-pro-luxe.png" alt="AI" className="w-full h-full object-cover" />
+  </div>
+);
+
+const GoldenSparkBadge = ({ size }: { size?: string }) => (
+  <Sparkles className={`${size === 'xs' ? 'w-3 h-3' : 'w-4 h-4'} text-amber-400`} />
+);
+
 interface Props {
-  chat:            Chat
+  chat:             Chat
   initialMessages: Message[]
   currentUserId:   string
 }
@@ -31,9 +42,9 @@ export default function AiChatWindow({ chat, initialMessages, currentUserId }: P
 
   const [input,        setInput]        = useState('')
   const [streaming,    setStreaming]     = useState(false)
-  const [streamText,   setStreamText]   = useState('')
+  const [streamText,    setStreamText]   = useState('')
   const [streamMsgId,  setStreamMsgId]  = useState<string | null>(null)
-  const [showInfo,     setShowInfo]     = useState(false)
+  const [showInfo,      setShowInfo]     = useState(false)
 
   const bottomRef  = useRef<HTMLDivElement>(null)
   const inputRef   = useRef<HTMLTextAreaElement>(null)
@@ -147,7 +158,7 @@ export default function AiChatWindow({ chat, initialMessages, currentUserId }: P
 
         {/* AI Avatar — real Gemini avatar with breathing glow */}
         <div className="relative flex-shrink-0">
-          <GeminiAvatar size="md" breathing={!streaming} />
+          <GeminiAvatarPlaceholder breathing={!streaming} />
           <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-midnight-950 shadow-[0_0_6px_#22c55e]" />
         </div>
 
@@ -251,7 +262,9 @@ export default function AiChatWindow({ chat, initialMessages, currentUserId }: P
         {/* Thinking indicator (before first chunk) */}
         {streaming && !streamText && (
           <div className="flex items-start gap-2.5 pr-12">
-            <GeminiLogo size="md" animated={true} />
+            <div className="w-8 h-8 rounded-full glass electric-border flex items-center justify-center animate-spin-slow">
+               <Sparkles className="w-4 h-4 text-electric" />
+            </div>
             <div className="glass rounded-2xl rounded-tl-sm px-4 py-3 border border-electric/15">
               <div className="flex items-center gap-1.5">
                 {[0, 1, 2].map((i) => (
