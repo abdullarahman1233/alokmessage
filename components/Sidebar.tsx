@@ -32,8 +32,6 @@ export default function Sidebar({ user, chats = [] }: Props) {
   const [search, setSearch]           = useState('')
   const [showProfile, setShowProfile] = useState(false)
   const [newChatOpen, setNewChatOpen] = useState(false)
-  const [newChatOpen, setNewChatOpen] = useState(false)
-  const [showProfile, setShowProfile] = useState(false)
 
   const activeSection = pathname.split('/')[1] ?? 'chat'
 
