@@ -6,7 +6,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 // ─── AI System Contact Identity ───────────────────────────────────────────────
 
-export const AI_CONTACT = {
+// ফাহিম ভাই, এখানে 'export' শব্দটি সরিয়ে দেওয়া হয়েছে যাতে নেক্সট জেএস এরর না দেয়।
+const AI_CONTACT = {
   id:            'ai-gemini-system-contact',
   displayName:   'Gemini 3 Pro (Official)',
   phone:         process.env.AI_NUMBER ?? '+8801643435122',
