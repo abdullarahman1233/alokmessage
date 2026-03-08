@@ -143,7 +143,7 @@ export async function bulkScanMessages(
 ): Promise<Array<{ id: string; result: AiScanResult }>> {
   const results = await Promise.allSettled(
     messages.map(async (msg) => ({
-      id:     msg.id,
+      id:      msg.id,
       result: await scanMessage(msg.content),
     }))
   )
@@ -175,7 +175,8 @@ export async function aiGuardAssist(
   context: string
 ): Promise<{ verdict: string; confidence: number; reasoning: string }> {
   try {
-    const model  = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' })
+    // ফাহিম ভাই, এখানে genAI এর পরিবর্তে gemini ব্যবহার করা হয়েছে যাতে বিল্ড এরর না দেয়।
+    const guardModel = gemini.getGenerativeModel({ model: 'gemini-1.5-pro' })
     const prompt = [
       'You are Alok Guard powered by Gemini 3 Pro. Analyze this pattern.',
       'Pattern: ' + pattern,
@@ -183,7 +184,7 @@ export async function aiGuardAssist(
       'Return ONLY valid JSON: {"verdict":"safe"|"suspicious"|"fraud"|"scam","confidence":0-100,"reasoning":"..."}',
     ].join('\n')
 
-    const result = await model.generateContent(prompt)
+    const result = await guardModel.generateContent(prompt)
     const text   = result.response.text().replace(/```json|```/g, '').trim()
     return JSON.parse(text)
   } catch {
